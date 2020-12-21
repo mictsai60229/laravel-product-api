@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Formmatter;
+namespace App\Formatters;
 
 use Illuminate\Support\Facades\Validator;
+use App\Formatters\BaseFormatter;
 
 
-class ProductFormatter{
+class ProductFormatter extends BaseFormatter{
 
     protected $_name = "Product";
 

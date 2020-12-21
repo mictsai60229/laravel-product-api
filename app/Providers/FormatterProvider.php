@@ -13,7 +13,7 @@ class FormatterProvider extends ServiceProvider{
      */
     public function register(){
         
-        $this->app->singleton('Formatter/Product', function ($app) {
+        $this->app->singleton('Formatter/product', function ($app) {
             return new ProductFormatter();
         });
     }
