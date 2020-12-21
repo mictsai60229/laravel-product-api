@@ -20,23 +20,41 @@ class BulkController extends Controller{
             'actions' => 'required'
         ]);
 
+        if ($validator->fails()) {
+            return $validator->errors();
+        }
+
         $index = $request->input('index');
         $config = $request->input('config');
         $actionType = $request->input('actionType');
         $actions = $request->input('actions');
 
-        $response = [];
-        $response['failure'] = [];
         $formatter = app("Formatter/{$config}");
 
+        $validatedActions = [];
+        $failureActions = [];
         foreach($actions as $action){
 
-            $action = $formatter->validate($action);
-            if (empty($action)){
-                $response['failure'][] = $action;
+            $validateRange = ($actionType === "index")?"all":"part";
+            $validatedAction = $formatter->validate($action, $validateRange);
+            
+            if (empty($validatedAction)){
+                $failureActions[] = $action;
+            }
+            else{
+                $validatedActions[] = $validatedAction;
             }
         }
 
-        return response()->json($response);
+
+        if (!empty($validatedActions)){
+            $response = app('Service\Elasticsearch\Bulk')->bulk($index, $actionType, $validatedActions);
+        }
+        else{
+            $response = [];
+        }
+        $response['failure'] = $failureActions;
+
+        return $response;
     }
 }

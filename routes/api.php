@@ -26,7 +26,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::put('/indices/create', [IndicesController::class, 'create']);
 Route::post('/indices/refresh', [IndicesController::class, 'refresh']);
 Route::post('/indices/setInterval', [IndicesController::class, 'setInterval']);
-Route::post('/indices/updateAliases', [IndicesController::class, 'updateAliases']);
+Route::post('/indices/setAliases', [IndicesController::class, 'setAliases']);
+Route::post('/indices/setAliasesLatest', [IndicesController::class, 'setAliasesLatest']);
 
 //bulk
 Route::post('/bulk/bulk', [BulkController::class, 'bulk']);

@@ -4,6 +4,12 @@ namespace App\Services\Elasticsearch;
 
 Class Bulk{
 
+    protected $ESIndicesRepo;
+
+    public function __construct(){
+        $this->ESIndicesRepo = app('Repository\Elasticsearch\Indices');
+    }
+
     /**
      * Undocumented function
      *
@@ -16,18 +22,29 @@ Class Bulk{
         
         $params = ['body' => []];
         
-        foreach ($requestBody as $fields){
+        foreach ($actions as $action){
             $params['body'][] = [
                 $actionType => [
                     '_index' => $index,
-                    '_id' => $fields['_id'],
+                    '_id' => $action['_id'],
                     '_type' => '_doc'
                 ]
             ];
-            unset($fields['_id']);
-            $params['body'][] = $fields;
+
+            unset($action['_id']);
+            if ($actionType === "index"){
+                $params['body'][] = $action;
+            }
+            else if($actionType === "update"){
+                $params['body'][] = [
+                    "doc" => $action
+                ];
+            }
+            
         }
 
         return $this->ESIndicesRepo->bulk($params);
     }
+
+    
 }

@@ -15,7 +15,7 @@ Class Indices{
     }
 
     /*
-    * Create index, set the newest index alias to "{$index}-newest"
+    * Create index, set the newest index alias to "{$index}-latest"
     * @param string $index, string $configPath, int $backupCount
     * @return 
     */
@@ -44,7 +44,7 @@ Class Indices{
         
         //set alias to "{$index}-newest"
         $createIndex = $response["index"];
-        $indexAlias = "{$index}-newest";
+        $indexAlias = "{$index}-latest";
         $this->setAliases($createIndex, $indexAlias);
         $response['alias'] = $indexAlias;
 
@@ -74,7 +74,7 @@ Class Indices{
     public function refresh(string $index){
         
         $params = [
-            'index' => index
+            'index' => $index
         ];
 
         return $this->ESIndicesRepo->refresh($params);
@@ -124,9 +124,9 @@ Class Indices{
     * @param string $index
     * @return Array[string]
     */
-    public function setAliasesCurrent(string $index){
+    public function setAliasesLatest(string $index){
         
-        $indices = countIndex($index);
+        $indices = $this->countIndex($index);
         return $this->setAliases($indices[0], $index);
     }
 
