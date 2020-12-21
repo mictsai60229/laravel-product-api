@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Elasticsearch\IndicesController;
 use App\Http\Controllers\Elasticsearch\CatController;
-use App\Http\Controllers\Elasticsearch\DocumentController;
+use App\Http\Controllers\Elasticsearch\BulkController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,16 +24,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 // indices
 Route::put('/indices/create', [IndicesController::class, 'create']);
-Route::delete('/indices/delete', [IndicesController::class, 'delete']);
-Route::post('/indices/bulk', [IndicesController::class, 'bulk']);
 Route::post('/indices/refresh', [IndicesController::class, 'refresh']);
-Route::post('/indices/putSettings', [IndicesController::class, 'putSettings']);
 Route::post('/indices/setInterval', [IndicesController::class, 'setInterval']);
 Route::post('/indices/updateAliases', [IndicesController::class, 'updateAliases']);
-Route::post('/indices/{action}Aliases', [IndicesController::class, 'addOrRemoveAliases']);
 
-//Document
-Route::match(['get', 'post'], '/document/search', [DocumentController::class, 'search']);
+//bulk
+Route::post('/bulk/bulk', [BulkController::class, 'bulk']);
 
 
 //cat

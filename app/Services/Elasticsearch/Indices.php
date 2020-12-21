@@ -15,7 +15,7 @@ Class Indices{
     }
 
     /*
-    * Create index,
+    * Create index, set the newest index alias to "{$index}-newest"
     * @param string $index, string $configPath, int $backupCount
     * @return 
     */
@@ -33,14 +33,22 @@ Class Indices{
 
         //add timestamp
         $date = date("YmdHis");
-        $index = "{$index}-{$date}";
+        $indexTimestamp = "{$index}-{$date}";
 
         $params = [
-            'index' => $index,
+            'index' => $indexTimestamp,
             'body' => $this->getCreateBody($configPath)
         ];
 
-        return $this->ESIndicesRepo->create($params);
+        $response = $this->ESIndicesRepo->create($params);
+        
+        //set alias to "{$index}-newest"
+        $createIndex = $response["index"];
+        $indexAlias = "{$index}-newest";
+        $this->setAliases($createIndex, $indexAlias);
+        $response['alias'] = $indexAlias;
+
+        return $response;
         
     }
 
@@ -213,19 +221,24 @@ Class Indices{
     * @return Json
     */
     public function updateAliases(string $action, string $index, string $alias){
-        
+
+
         $params = [
             'body' => [
                 'actions' => [
                     [
                         $action => [
-                            "index" => $index,
-                            "alias" => $alias
+                            'index' => $index,
+                            'alias' => $alias
                         ]
                     ]
                 ]
             ]
         ];
+
+        if ($action === "add"){
+            $params['body']['actions'][0][$action]["is_write_index"] = True;
+        }
 
         return $this->ESIndicesRepo->updateAliases($params);
     }
