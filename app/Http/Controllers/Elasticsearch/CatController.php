@@ -13,14 +13,14 @@ class CatController extends Controller{
 
         $params = $request->all();
 
-        return app('Elasticsearch\Cat')->aliases($params);
+        return app('Repository\Elasticsearch\Cat')->aliases($params);
     }
 
     public function indices(Request $request){
 
         $params = $request->all();
 
-        return app('Elasticsearch\Cat')->indices($params);
+        return app('Repository\Elasticsearch\Cat')->indices($params);
     }
 
     
