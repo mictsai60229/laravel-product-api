@@ -4,11 +4,14 @@ namespace App\Services\Elasticsearch;
 
 Class Bulk{
 
-    /*
-    * Bulk index
-    * @param string $index, string actionType, array $actions
-    * @return Json
-    */
+    /**
+     * Undocumented function
+     *
+     * @param string $index
+     * @param string $actionType
+     * @param array $actions
+     * @return void
+     */
     public function bulk(string $index, string $actionType, array $actions){
         
         $params = ['body' => []];
@@ -17,9 +20,11 @@ Class Bulk{
             $params['body'][] = [
                 $actionType => [
                     '_index' => $index,
+                    '_id' => $fields['_id'],
                     '_type' => '_doc'
                 ]
             ];
+            unset($fields['_id']);
             $params['body'][] = $fields;
         }
 

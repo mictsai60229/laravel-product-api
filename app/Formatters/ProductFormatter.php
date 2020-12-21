@@ -12,6 +12,7 @@ class ProductFormatter extends BaseFormatter{
 
     private function getValidationRules(){
         return [
+            "_id" => "required",
             "prod_id" => "required|integer",
             "url_id" => "required|integer",
             "name" => "required",
