@@ -12,24 +12,17 @@ use Illuminate\Support\Facades\Validator;
 
 class BaseFormatter{
 
-    protected $transformFunctions;
-    protected $validationRules;
-    protected $_name = "Base";
-
-    public function __construct(){
-        $this->transformFunctions = $this->getTransformFunctions();
-        $this->validationRules = $this->getValidationRules();
-    }
+    protected $transformFunctions = [];
+    protected $validationRules = [];
+    public $_name = "Base";
 
     /*
     *
     *@retrun 
     */
-    public function validate(array $data){
+    public function validate(array $data, string $range="all"){
 
-        $validateData = [];
-
-        $validator = $this->getValidator($data);
+        $validator = $this->getValidator($data, $range);
         if ($validator->fails()){
 
             $validatorErrorMessages = json_encode($validator->errors());
@@ -38,12 +31,7 @@ class BaseFormatter{
             return null;
         }
 
-        foreach (array_keys($data) as $key){
-            if (array_key_exists($key, $this->validationRules)){
-                $validateData[$key] = $data[$key];
-            }
-        }
-        return $this->transform($validateData);
+        return $this->transform($data);
     }
 
 
@@ -58,16 +46,21 @@ class BaseFormatter{
         return $data;
     }
 
-    public function getValidator(array $data){
-        return Validator::make($data, $this->validationRules);
-    }
+    public function getValidator(array $data, string $range){
 
-    private function getValidationRules(){
-        return [];
-    }
+        if ($range === "all"){
+            return Validator::make($data, $this->validationRules);
+        }
+        else if($range === "part"){
 
-    private function getTransformFunctions(){
-        return [];
+            $validationRules = [];
+            foreach (array_keys($data) as $key){
+                if (array_key_exists($key, $this->validationRules)){
+                    $validationRules[$key] = $this->validationRules[$key];
+                }
+            }
+            return Validator::make($data, $validationRules);
+        }
     }
     
 }
