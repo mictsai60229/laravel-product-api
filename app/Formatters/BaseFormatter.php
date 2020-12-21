@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Formmatter;
+namespace App\Formatters;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -16,7 +16,7 @@ class BaseFormatter{
     protected $validationRules;
     protected $_name = "Base";
 
-    public function __constuct(){
+    public function __construct(){
         $this->transformFunctions = $this->getTransformFunctions();
         $this->validationRules = $this->getValidationRules();
     }
@@ -59,7 +59,6 @@ class BaseFormatter{
     }
 
     public function getValidator(array $data){
-
         return Validator::make($data, $this->validationRules);
     }
 
