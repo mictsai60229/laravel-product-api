@@ -18,11 +18,33 @@ Class Bulk{
      * @param array $actions
      * @return void
      */
-    public function bulk(string $index, string $actionType, array $actions){
+    public function bulk(string $index, string $config, string $actionType, array $actions, string $validateRange){
+        
+        $formatter = app("Formatter/{$config}");
+
+        $validatedActions = [];
+        $failureActions = [];
+        foreach($actions as $action){
+
+            $validatedAction = $formatter->validate($action, $validateRange);
+            if (empty($validatedAction)){
+                $failureActions[] = $action;
+            }
+            else{
+                $validatedActions[] = $validatedAction;
+            }
+        }
+
+        if (empty($validatedActions)){
+            $response = [];
+            $response['failure'] = $failureActions;
+
+            return $responses;
+        }
         
         $params = ['body' => []];
         
-        foreach ($actions as $action){
+        foreach ($validatedActions as $action){
             $params['body'][] = [
                 $actionType => [
                     '_index' => $index,
