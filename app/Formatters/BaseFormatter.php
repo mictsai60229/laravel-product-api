@@ -14,7 +14,7 @@ class BaseFormatter{
 
     protected $transformFunctions = [];
     protected $validationRules = [];
-    public $_name = "Base";
+    public $_name = "base";
 
     /*
     *
@@ -37,10 +37,8 @@ class BaseFormatter{
 
     public function transform(array $data){
 
-        foreach (array_keys($data) as $key){
-            if (array_key_exists($key, $this->transformFunctions)){
-                $data[$key] = $this->transformFunctions[$key]($data[$key]);
-            }
+        foreach (array_intersect_key($data, $this->transformFunctions) as $key){
+            $data[$key] = $this->transformFunctions[$key]($data[$key]);
         }
 
         return $data;
@@ -54,10 +52,8 @@ class BaseFormatter{
         else if($range === "part"){
 
             $validationRules = [];
-            foreach (array_keys($data) as $key){
-                if (array_key_exists($key, $this->validationRules)){
-                    $validationRules[$key] = $this->validationRules[$key];
-                }
+            foreach (array_intersect_key($data, $this->validationRules) as $key){
+                $validationRules[$key] = $this->validationRules[$key];
             }
             return Validator::make($data, $validationRules);
         }
