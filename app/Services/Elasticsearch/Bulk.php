@@ -2,13 +2,9 @@
 
 namespace App\Services\Elasticsearch;
 
-Class Bulk{
+use App\Exceptions\CommonApiException;
 
-    protected $ESIndicesRepo;
-
-    public function __construct(){
-        $this->ESIndicesRepo = app('Repository\Elasticsearch\Indices');
-    }
+Class Bulk extends Indices{
 
     /**
      * Undocumented function
@@ -18,8 +14,14 @@ Class Bulk{
      * @param array $actions
      * @return void
      */
-    public function bulk(string $index, string $config, string $actionType, array $actions, string $validateRange){
-        
+    public function bulk(string $index, string $config, string $actionType, array $actions, string $validateRange, bool $force){
+
+        $indexLatest = "{$index}-latest";
+        // check {$index}-latest is setted
+        if (!$force && count($this->catAliases($indexLatest)) == 0){
+            throw new CommonApiException("Index with name {$index}-latest doesn't exist.");
+        }
+
         $formatter = app("Formatter/{$config}");
 
         $validatedActions = [];
@@ -47,7 +49,7 @@ Class Bulk{
         foreach ($validatedActions as $action){
             $params['body'][] = [
                 $actionType => [
-                    '_index' => $index,
+                    '_index' => $indexLatest,
                     '_id' => $action['_id'],
                     '_type' => '_doc'
                 ]
@@ -65,8 +67,7 @@ Class Bulk{
             
         }
 
-        return $this->ESIndicesRepo->bulk($params);
+        return $this->EsIndicesRepo->bulk($params);
     }
-
     
 }
