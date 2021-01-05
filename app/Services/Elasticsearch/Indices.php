@@ -21,7 +21,7 @@ Class Indices{
     * @param string $index, string $configPath
     * @return 
     */
-    public function create(string $index, string $configPath){
+    public function create(string $index, int $backupCount=1, float $docsThreshold=0.7){
         
 
         // check $index-latest is setted
@@ -29,6 +29,8 @@ Class Indices{
         if(count($this->catAliases($indexAlias)) > 0){
             throw new CommonApiException("Index with name {$index}-latest exist.");
         }
+
+        $this->deleteIndices($index, $backupCount, $docsThreshold);
         
         //add timestamp
         $date = date("YmdHis");
@@ -36,7 +38,7 @@ Class Indices{
 
         $params = [
             'index' => $indexTimestamp,
-            'body' => $this->getCreateBody($configPath)
+            'body' => $this->getCreateBody("elasticsearch/{$index}")
         ];
 
         $response = $this->EsIndicesRepo->create($params);
@@ -96,14 +98,21 @@ Class Indices{
         return ["remove"=>["index"=>$latestIndex, "alias"=>$indexAlias]];
     }
 
-    public function deleteIndices(string $index, int $backupCount=2, float $docsThreshold=0.7){
+    public function deleteIndices(string $index, int $backupCount=1, float $docsThreshold=0.7){
 
         $indices = $this->countIndex($index, $docsThreshold);
+        $currentIndices = $this->catAliases($index);
         $deleteIndices = [];
 
         // delete index not in backupCount
         $indicesCount = count($indices);
-        for ( $i=$backupCount ; $i<$indicesCount ; $i++ ){
+        for ($i=$backupCount ; $i<$indicesCount ; $i++ ){
+
+            //avoid removing current alias
+            if (in_array($indices[$i], $currentIndices)){
+                continue;
+            }
+
             $this->delete($indices[$i]);
             $deleteIndices[] = $indices[$i];
         }

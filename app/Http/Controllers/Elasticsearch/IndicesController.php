@@ -24,7 +24,9 @@ class IndicesController extends Controller{
         
         $validator = Validator::make($request->all(), [
             'index' => 'required',
-            'configPath' => 'required',
+            'backupCount' => 'required|numeric|min:0',
+            'force' => 'nullable|boolean',
+            'threshold' => 'nullable|numeric|between:0,1'
         ]);
 
         if ($validator->fails()) {
@@ -32,10 +34,11 @@ class IndicesController extends Controller{
         }
 
         $index = $request->input('index');
-        $configPath = $request->input('configPath');
-        $backupCount = $request->input('backupCount', -1);
+        $backupCount = $request->input('backupCount', 1);
+        $force = $request->input('force', null);
+        $docsThreshold = $force?0.0:(float)$request->input('threshold', 0.7);
         
-        return $this->EsIndices->create($index, $configPath, $backupCount);
+        return $this->EsIndices->create($index, $backupCount, $docsThreshold);
     }
 
     public function startBulk(Request $request){
@@ -110,10 +113,11 @@ class IndicesController extends Controller{
         return $this->EsIndices->setAliases($index, $alias);
     }
 
-    public function setAliasesLatest(Request $request){
+    public function changeIndices(Request $request){
 
         $validator = Validator::make($request->all(), [
             'index' => 'required',
+            'alias' => 'nullable',
             'force' => 'nullable|boolean',
             'threshold' => 'nullable|numeric|between:0,1'
         ]);
@@ -123,10 +127,17 @@ class IndicesController extends Controller{
         }
 
         $index = $request->input('index');
+        $alias = $request->input('alias', null);
         $force = $request->input('force', null);
         $docsThreshold = $force?0.0:(float)$request->input('threshold', 0.7);
 
-        return $this->EsIndices->setAliasesLatest($index, $docsThreshold);
+        if (empty($alias)){
+            return $this->EsIndices->setAliasesLatest($index, $docsThreshold);
+        }
+        else{
+            return $this->EsIndices->setAliases($index, $alias);
+        }
+        
     }
 
 }

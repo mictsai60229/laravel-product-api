@@ -28,7 +28,7 @@ Route::post('/indices/startBulk', [IndicesController::class, 'startBulk']);
 Route::post('/indices/endBulk', [IndicesController::class, 'endBulk']);
 Route::delete('/indices/deleteIndices', [IndicesController::class, 'deleteIndices']);
 Route::post('/indices/setAliases', [IndicesController::class, 'setAliases']);
-Route::post('/indices/setAliasesLatest', [IndicesController::class, 'setAliasesLatest']);
+Route::post('/indices/setAliasesLatest', [IndicesController::class, 'changeIndices']);
 
 //bulk
 Route::post('/bulk/bulk', [BulkController::class, 'bulk']);

@@ -19,10 +19,8 @@ class BulkController extends Controller{
 
         $validator = Validator::make($request->all(), [
             'index' => 'required',
-            'config' => 'required',
             'actionType' => ['required', Rule::in(['index', 'delete', 'update'])],
-            'actions' => 'required',
-            'force' => 'nullable|boolean'
+            'body' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -30,12 +28,10 @@ class BulkController extends Controller{
         }
 
         $index = $request->input('index');
-        $config = $request->input('config');
         $actionType = $request->input('actionType');
-        $actions = $request->input('actions');
+        $actions = $request->input('body');
         $validateRange = ($request->input('actionType') === "index")?"all":"part";
-        $force = $request->input('force', false);
 
-        return $this->EsBulk->bulk($index, $config, $actionType, $actions, $validateRange, $force);
+        return $this->EsBulk->bulk($index, $actionType, $actions, $validateRange);
     }
 }

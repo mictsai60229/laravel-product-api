@@ -14,15 +14,15 @@ Class Bulk extends Indices{
      * @param array $actions
      * @return void
      */
-    public function bulk(string $index, string $config, string $actionType, array $actions, string $validateRange, bool $force){
+    public function bulk(string $index, string $actionType, array $actions, string $validateRange){
 
         $indexLatest = "{$index}-latest";
         // check {$index}-latest is setted
-        if (!$force && count($this->catAliases($indexLatest)) == 0){
+        if (count($this->catAliases($indexLatest)) == 0){
             throw new CommonApiException("Index with name {$index}-latest doesn't exist.");
         }
 
-        $formatter = app("Formatter/{$config}");
+        $formatter = app("Formatter/{$index}");
 
         $validatedActions = [];
         $failureActions = [];
@@ -37,12 +37,14 @@ Class Bulk extends Indices{
             }
         }
 
+        
         if (empty($validatedActions)){
             $response = [];
             $response['failure'] = $failureActions;
 
-            return $responses;
+            return $response;
         }
+        $response['failure'] = $failureActions;
         
         $params = ['body' => []];
         
